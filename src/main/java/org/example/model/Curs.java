@@ -14,7 +14,6 @@ public class Curs {
     @XmlElement(name = "studentsList")
 
     private List<Student> studentsList  = new ArrayList<>();
-   // @XmlElementWrapper(name = "subjectList")  //SE ME MEJOR
 
 
     @XmlTransient//ME SALE UNA DE MAS AL FINAL SINO LO QUITO
@@ -39,13 +38,16 @@ public class Curs {
                     student.setSubjectList(subjectsC1);
                     studentsList.add(student);
                 }
+           //     System.out.println(studentsList.size());
             } else {
                 List<Subject> subjectsC2 = subjectsC2();
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 5; i++) {
                     Student student = new Student("student" + i, "surname" + i, new Date());
                     student.setSubjectList(subjectsC2);
                     studentsList.add(student);
                 }
+           //     System.out.println(studentsList.size());
+
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

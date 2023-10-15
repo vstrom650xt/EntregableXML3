@@ -28,17 +28,13 @@ import java.util.List;
 
 public class LogicXML {
 
-    public static boolean fileExist(Path path) {
-        return Files.exists(path);
-
-    }
 
     public static void writeFileJAXB(Curs curs) {
 
         try {
             JAXBContext context = JAXBContext.newInstance(Curs.class);
             Marshaller marshaller = context.createMarshaller();
-            File xmlFile = new File( curs.getYearCurs() +"curs.xml"); // Define the XML file path
+            File xmlFile = new File(curs.getYearCurs() + "curs.xml"); // Define the XML file path
             marshaller.marshal(curs, xmlFile);
 
         } catch (JAXBException e) {
@@ -46,23 +42,39 @@ public class LogicXML {
         }
     }
 
-    public static void readXMLJAXB(Curs curs) {
-        Path path = Paths.get(curs.getYearCurs() + "curs.xml");
+    public static void readXMLJAXB(Curs curs1, Curs curs2) {
+        Path path = Paths.get(curs1.getYearCurs() + "curs.xml");
+        Path path2 = Paths.get(curs2.getYearCurs() + "curs.xml");
 
-        if (Files.exists(path)) {
+        if (Files.exists(path) && Files.exists(path2)) {
 
             try {
                 JAXBContext context = JAXBContext.newInstance(Curs.class);
                 Unmarshaller unmarshaller = context.createUnmarshaller();
-                Curs curs1 = (Curs) unmarshaller.unmarshal(path.toFile());
-                curs1.getStudentsList();
-
-                putNotes(curs1);
-
-                    LogicCurs.checkSubjectScore(curs1);
-                    writeFileJAXB(curs1);
+                Curs curs11 = (Curs) unmarshaller.unmarshal(path.toFile());
+                Curs curs22 = (Curs) unmarshaller.unmarshal(path2.toFile());
 
 
+                LogicCurs.putNotes(curs11);
+                LogicCurs.putNotes(curs22);
+
+  //              System.out.println(curs22);
+
+
+                LogicCurs.checkSubjectScore(curs22);
+                LogicCurs.changeStudentYear(curs11,curs22);
+
+//
+//                System.out.println(curs22.getStudentsList().size());
+//                System.out.println(curs11.getStudentsList().size());
+
+                LogicCurs.fillCFirstCurs(curs11);
+
+              //  System.out.println(curs11.getStudentsList().size());
+
+
+                writeFileJAXB(curs11);
+                writeFileJAXB(curs22);
 
 
             } catch (JAXBException e) {
@@ -74,16 +86,7 @@ public class LogicXML {
         }
     }
 
-    private static void putNotes(Curs curs11) {
-        List<Student> listaStud = curs11.getStudentsList();
-        for (Student s:listaStud ) {
-            List<Subject> subjects = s.getSubjectList();
-            for (Subject sub: subjects ) {
-                sub.setScore((int)(Math.random()*(10 +5)+0));
 
-            }
-        }
-    }
 
 
     public static void saveXMLDOM(Curs curs) {
@@ -131,4 +134,10 @@ public class LogicXML {
 
 
     }
+
+
+
+
+
+
 }
