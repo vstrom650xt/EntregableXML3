@@ -4,10 +4,10 @@ package org.example.model;
 import javax.xml.bind.annotation.*;
 
 public class Subject {
-    @XmlAttribute
+
     String subName;
 
-    @XmlElement
+
     private Integer score;
 
 
@@ -17,6 +17,23 @@ public class Subject {
         this.score = score;
     }
 
+    public String getSubName() {
+        return subName;
+    }
+    @XmlAttribute
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    @XmlElement
+    public int setScore(Integer score) {
+        this.score = score;
+        return score;
+    }
 
     @Override
     public String toString() {

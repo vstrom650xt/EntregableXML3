@@ -1,7 +1,12 @@
 package org.example.model;
 
+import org.example.controller.CustomDateAdapter;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +15,8 @@ public class Student {
 
     private String name;
     private String apellido;
+
+    @XmlTransient
     private Date birthdate;
 
 
@@ -21,6 +28,7 @@ public class Student {
         this.birthdate = birthdate;
         this.subjectList = new ArrayList<>();
     }
+
 
     public Student(){}
     public String getName() {
@@ -39,6 +47,10 @@ public class Student {
         this.apellido = apellido;
     }
 
+
+
+    ////////////////////CON ESTO PASA POR EL CUSTOMADAPTER TODAS LAS FECHAS
+    @XmlJavaTypeAdapter(CustomDateAdapter.class)
     public Date getBirthdate() {
         return birthdate;
     }
