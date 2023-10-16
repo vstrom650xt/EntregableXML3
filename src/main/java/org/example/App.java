@@ -28,7 +28,6 @@ public class App {
 
 //se ponen notas a los alumnos
         LogicXML.readXMLJAXB(curs,c2);
-   //     LogicXML.readXMLJAXB(c2);
 
 //
 //        System.out.println(curs);
@@ -40,28 +39,8 @@ public class App {
         //       System.out.println(curs);
 
 
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser saxParser = factory.newSAXParser();
 
-            MySaxHandler handler = new MySaxHandler();
-            saxParser.parse("1curs.xml", handler);
 
-            List<Student> studentsList = handler.getStudentsList();
-            for (Student student : studentsList) {
-                System.out.println("Student Name: " + student.getName());
-                System.out.println("Student Apellido: " + student.getApellido());
-                System.out.println("Student Birthdate: " + student.getBirthdate());
-                System.out.println("Subjects: ");
-                for (Subject subject : student.getSubjectList()) {
-                    System.out.println("  Subject Name: " + subject.getSubName());
-                    System.out.println("  Subject Score: " + subject.getScore());
-                }
-                System.out.println("------------------------------");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 

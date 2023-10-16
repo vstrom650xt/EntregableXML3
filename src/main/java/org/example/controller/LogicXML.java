@@ -5,14 +5,15 @@ import org.example.model.Student;
 import org.example.model.Subject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -139,5 +140,75 @@ public class LogicXML {
 
 
 
+    public static  void readSAX(Curs curs){
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        // Crea un manejador personalizado que extiende DefaultHandler.
+        DefaultHandler handler = new DefaultHandler() {
+            boolean curs  = false;
+
+            boolean bstudentList  = false;
+
+            boolean bname  = false;
+            boolean bapellido = false;
+            boolean bbirthdate = false;
+            boolean bsubjectList = false;
+            boolean bsubject = false;
+
+
+
+
+
+            public void startElement(String uri , String local , String qname , Attributes attributes)throws SAXException {
+
+
+                System.out.println("inicia element" + qname);
+
+                if (qname.equalsIgnoreCase("curs")) {
+                    String id = attributes.getValue("yearcurs");
+                    System.out.println("yearcurs "+id);
+
+                }
+
+                if(qname.equalsIgnoreCase("studenList")){
+                    if (qname.equalsIgnoreCase("apellido")){
+                        bapellido = true;
+                    }
+                    if (qname.equalsIgnoreCase("birthdate")){
+                           bbirthdate = true;
+                    }
+                    if (qname.equalsIgnoreCase("name")){
+                            bname = true;
+
+                    }
+                    if (qname.equalsIgnoreCase("subjectList")){
+                        String nameSub = attributes.getValue("subName");
+                        System.out.println("subName "+ nameSub);
+                        int score =
+                    }
+
+                }
+
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+    }
 
 }
