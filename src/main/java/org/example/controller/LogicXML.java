@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -59,11 +60,11 @@ public class LogicXML {
                 LogicCurs.putNotes(curs11);
                 LogicCurs.putNotes(curs22);
 
-  //              System.out.println(curs22);
+                //              System.out.println(curs22);
 
 
-                LogicCurs.checkSubjectScore(curs22);
-                LogicCurs.changeStudentYear(curs11,curs22);
+                //   LogicCurs.checkSubjectScore(curs22);
+                //  LogicCurs.changeStudentYear(curs11,curs22);
 
 //
 //                System.out.println(curs22.getStudentsList().size());
@@ -71,7 +72,7 @@ public class LogicXML {
 
                 LogicCurs.fillCFirstCurs(curs11);
 
-              //  System.out.println(curs11.getStudentsList().size());
+                //  System.out.println(curs11.getStudentsList().size());
 
 
                 writeFileJAXB(curs11);
@@ -86,8 +87,6 @@ public class LogicXML {
             System.out.println("file not found");
         }
     }
-
-
 
 
     public static void saveXMLDOM(Curs curs) {
@@ -137,78 +136,74 @@ public class LogicXML {
     }
 
 
-
-
-
-    public static  void readSAX(Curs curs){
+    public static void readSAX(Curs curs) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser saxParser = factory.newSAXParser();
-        // Crea un manejador personalizado que extiende DefaultHandler.
-        DefaultHandler handler = new DefaultHandler() {
-            boolean curs  = false;
+        try {
+            SAXParser saxParser = factory.newSAXParser();
+            // Specify the XML file you want to parse
+            File xmlFile = new File("1curs.xml");
+            saxParser.parse(xmlFile, new MyHandler());
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-            boolean bstudentList  = false;
+    static class MyHandler extends DefaultHandler {
+        private boolean inStudentsList = false;
+        private boolean inSubject = false;
+        private boolean inScore = false;
+        private String currentSubjectName;
+        private int currentScore;
+        private StringBuilder currentElementValue;
 
-            boolean bname  = false;
-            boolean bapellido = false;
-            boolean bbirthdate = false;
-            boolean bsubjectList = false;
-            boolean bsubject = false;
+        private String studentName;
+        private String studentSurname;
+        private String birthdate;
 
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+            currentElementValue = new StringBuilder();
 
-
-
-
-            public void startElement(String uri , String local , String qname , Attributes attributes)throws SAXException {
-
-
-                System.out.println("inicia element" + qname);
-
-                if (qname.equalsIgnoreCase("curs")) {
-                    String id = attributes.getValue("yearcurs");
-                    System.out.println("yearcurs "+id);
-
-                }
-
-                if(qname.equalsIgnoreCase("studenList")){
-                    if (qname.equalsIgnoreCase("apellido")){
-                        bapellido = true;
-                    }
-                    if (qname.equalsIgnoreCase("birthdate")){
-                           bbirthdate = true;
-                    }
-                    if (qname.equalsIgnoreCase("name")){
-                            bname = true;
-
-                    }
-                    if (qname.equalsIgnoreCase("subjectList")){
-                        String nameSub = attributes.getValue("subName");
-                        System.out.println("subName "+ nameSub);
-                        int score =
-                    }
-
-                }
-
-
-
-
+            if (qName.equalsIgnoreCase("studentsList")) {
+                inStudentsList = true;
+            } else if (qName.equalsIgnoreCase("subject")) {
+                inSubject = true;
+                currentSubjectName = attributes.getValue("subName");
+            } else if (qName.equalsIgnoreCase("score")) {
+                inScore = true;
+            } else if (qName.equalsIgnoreCase("name") || qName.equalsIgnoreCase("apellido") || qName.equalsIgnoreCase("birthdate")) {
             }
+        }
 
-
-
-
-
-
-
-
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            if (inStudentsList) {
+                if (qName.equalsIgnoreCase("studentsList")) {
+                    inStudentsList = false;
+                    System.out.println("Student Name: " + studentName);
+                    System.out.println("Student Surname: " + studentSurname);
+                    System.out.println("Birthdate: " + birthdate);
+                } else if (qName.equalsIgnoreCase("subject")) {
+                    inSubject = false;
+                    System.out.println("Subject: " + currentSubjectName + ", Score: " + currentScore);
+                } else if (qName.equalsIgnoreCase("score")) {
+                    inScore = false;
+                    currentScore = Integer.parseInt(currentElementValue.toString().trim());
+                }
+            }
+            if (qName.equalsIgnoreCase("name")) {
+                studentName = currentElementValue.toString().trim();
+            } else if (qName.equalsIgnoreCase("apellido")) {
+                studentSurname = currentElementValue.toString().trim();
+            } else if (qName.equalsIgnoreCase("birthdate")) {
+                birthdate = currentElementValue.toString().trim();
+            }
 
         }
 
-
-
-
-
-
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            currentElementValue.append(new String(ch, start, length).trim());
+        }
     }
-
 }

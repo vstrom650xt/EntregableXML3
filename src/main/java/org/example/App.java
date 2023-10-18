@@ -39,6 +39,7 @@ public class App {
         //       System.out.println(curs);
 
 
+        LogicXML.readSAX(curs);
 
 
     }
