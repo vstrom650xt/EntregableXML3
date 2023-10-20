@@ -1,7 +1,6 @@
 package org.example;
 
 import org.example.controller.LogicXML;
-import org.example.controller.MySaxHandler;
 import org.example.model.Curs;
 import org.example.model.Student;
 import org.example.model.Subject;
@@ -23,11 +22,22 @@ public class App {
 //        System.out.println(c2);//
 
         //se inicia el curso sin notas
-        LogicXML.writeFileJAXB(curs);
-        LogicXML.writeFileJAXB(c2);
+
+        //crearDom
+        LogicXML.generateXML(curs);
+        LogicXML.generateXML(c2);
+
+        //leerDom
+
+        LogicXML.readDom(curs,c2);
+
+
+//
+//        LogicXML.writeFileJAXB(curs);
+//        LogicXML.writeFileJAXB(c2);
 
 //se ponen notas a los alumnos
-        LogicXML.readXMLJAXB(curs,c2);
+   //     LogicXML.readXMLJAXB(curs,c2);
 
 //
 //        System.out.println(curs);
@@ -39,7 +49,7 @@ public class App {
         //       System.out.println(curs);
 
 
-        LogicXML.readSAX(curs);
+   //     LogicXML.readSAX(curs);
 
 
     }

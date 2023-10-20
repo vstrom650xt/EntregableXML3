@@ -3,8 +3,7 @@ package org.example.controller;
 import org.example.model.Curs;
 import org.example.model.Student;
 import org.example.model.Subject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -27,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class LogicXML {
 
@@ -57,8 +57,8 @@ public class LogicXML {
                 Curs curs22 = (Curs) unmarshaller.unmarshal(path2.toFile());
 
 
-                LogicCurs.putNotes(curs11);
-                LogicCurs.putNotes(curs22);
+        //        LogicCurs.putNotes(curs11);
+         //       LogicCurs.putNotes(curs22);
 
                 //              System.out.println(curs22);
 
@@ -88,31 +88,48 @@ public class LogicXML {
         }
     }
 
-
-    public static void saveXMLDOM(Curs curs) {
-        List<Student> lis = new ArrayList<>();
-        lis = curs.getStudentsList();
-
-
+    public static void generateXML(Curs curs) {
         try {
-            // Crear una fábrica de documentos XML
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            // Crear un constructor de documentosW
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            // Crear un nuevo documento XML vacío
-            Document doc = db.newDocument();
-            Element eRaiz = doc.createElement("curs");
-            doc.appendChild(eRaiz);
-            Element eCurs = doc.createElement("yearCurs");
-            eRaiz.appendChild(eCurs);
-            Element eStudentsList = doc.createElement("studentsList");
-            eRaiz.appendChild(eStudentsList);
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-            for (int i = 0; i < lis.size(); i++) {
+            Document doc = docBuilder.newDocument();
+            Element cursElement = doc.createElement("curs");
+            doc.appendChild(cursElement);
+            Attr attr = doc.createAttribute("subName");
+            attr.setValue("1");
+            cursElement.setAttributeNode(attr);
 
 
+            for (Student student :  curs.getStudentsList()) {
+                Element studentElement = doc.createElement("studentsList");
+                cursElement.appendChild(studentElement);
+
+                Element nameElement = doc.createElement("name");
+                nameElement.appendChild(doc.createTextNode(student.getName()));
+                studentElement.appendChild(nameElement);
+
+                Element apellidoElement = doc.createElement("apellido");
+                apellidoElement.appendChild(doc.createTextNode(student.getApellido()));
+                studentElement.appendChild(apellidoElement);
+
+                Element birthdateElement = doc.createElement("birthdate");
+                birthdateElement.appendChild(doc.createTextNode(student.getBirthdate().toString()));
+                studentElement.appendChild(birthdateElement);
+
+                Element subjectListElement = doc.createElement("subjectList");
+                studentElement.appendChild(subjectListElement);
+
+                for ( Subject sub:  student.getSubjectList()){
+                    Element subjectElement = doc.createElement("subject");
+                    subjectElement.setAttribute("subName", sub.getSubName());
+                    subjectListElement.appendChild(subjectElement);
+
+                    Element scoreElement = doc.createElement("score");
+                    scoreElement.appendChild(doc.createTextNode(sub.getScore() == null ? "" : sub.getScore().toString()));
+                    subjectElement.appendChild(scoreElement);
+                }
             }
-
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = null;
@@ -122,19 +139,71 @@ public class LogicXML {
                 throw new RuntimeException(e);
             }
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("ejercicio.xml"));
+            StreamResult result = new StreamResult(new File(curs.getYearCurs() + "ejercicioDOM.xml"));
             // Transformar y guardar el documento XML en un archivo llamado "ejercicio.xml"
             transformer.transform(source, result);
-
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
     }
 
+    public static void readDom(Curs curs1, Curs curs2) {
+        Path path = Paths.get(curs1.getYearCurs() + "curs.xml");
+        Path path2 = Paths.get(curs2.getYearCurs() + "curs.xml");
+
+        try {
+            File xmlFile = new File(path.toUri());
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(xmlFile);
+
+            doc.getDocumentElement().normalize();
+
+            Element rootElement = doc.getDocumentElement();
+
+            int yearCurs = Integer.parseInt(rootElement.getAttribute("yearCurs"));
+
+            System.out.println("yearCurs: " + yearCurs);
+
+            NodeList studentList = doc.getElementsByTagName("studentsList");
+
+            for (int i = 0; i < studentList.getLength(); i++) {
+                Node studentNode = studentList.item(i);
+                if (studentNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element studentElement = (Element) studentNode;
+
+                    // Extrae los elementos dentro de cada estudiante
+                    String name = studentElement.getElementsByTagName("name").item(0).getTextContent();
+                    String apellido = studentElement.getElementsByTagName("apellido").item(0).getTextContent();
+                    String birthdate = studentElement.getElementsByTagName("birthdate").item(0).getTextContent();
+
+                    System.out.println("Nombre: " + name);
+                    System.out.println("Apellido: " + apellido);
+                    System.out.println("Fecha de nacimiento: " + birthdate);
+
+                    // Obtén la lista de asignaturas para el estudiante
+                    NodeList subjectList = studentElement.getElementsByTagName("subject");
+
+                    for (int j = 0; j < subjectList.getLength(); j++) {
+                        Node subjectNode = subjectList.item(j);
+                        if (subjectNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element subjectElement = (Element) subjectNode;
+
+                            String subName = subjectElement.getAttribute("subName");
+                            String score = subjectElement.getElementsByTagName("score").item(0).getTextContent();
+
+                            System.out.println("Nombre de la asignatura: " + subName);
+                            System.out.println("Puntuación: " + score);
+                        }
+                    }
+                    System.out.println("-----------------------------------------------------------------------------");
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void readSAX(Curs curs) {
         SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -205,5 +274,6 @@ public class LogicXML {
         public void characters(char[] ch, int start, int length) throws SAXException {
             currentElementValue.append(new String(ch, start, length).trim());
         }
+
     }
 }

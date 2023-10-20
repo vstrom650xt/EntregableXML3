@@ -3,22 +3,23 @@ package org.example.controller;
 import org.example.model.Curs;
 import org.example.model.Student;
 import org.example.model.Subject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 public class LogicCurs {
-
-
     public static void putNotes(Curs curs11) {
         List<Student> listaStud = curs11.getStudentsList();
         for (Student s : listaStud) {
             List<Subject> subjects = s.getSubjectList();
             for (Subject sub : subjects) {
-                sub.setScore((int) (Math.random() * 7) + 4);
-
+                   sub.setScore((int) (Math.random() * 7) + 4);
             }
         }
     }
@@ -46,7 +47,6 @@ public class LogicCurs {
         }
 
         curs2.getStudentsList().addAll(pasan);
-
         listaStud.removeAll(pasan);
 
         return listaStud;
@@ -77,6 +77,8 @@ public class LogicCurs {
 
         return listaStud;
     }
+
+
 
     public static List<Student> fillCFirstCurs(Curs curs) {
         int i = 0;
